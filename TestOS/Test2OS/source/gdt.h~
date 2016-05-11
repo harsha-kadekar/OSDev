@@ -1,0 +1,48 @@
+#ifndef GDT_H
+#define GDT_H
+
+/*
+This file defines the structure of the Global Descriptor Table.
+It has two parts - 1) Actual Global Descriptor Table. 2) Structure of the GDTR registor
+Global Descriptor Table defines different segments.
+GDTR register defines the Global Descriptor Table itself.
+*/
+
+
+/*
+This structure defines the GDTR register. It has two parts
+1. base address (32 bits) - It points to the base address of the Global Descriptor Table. GDT will be created in physical memory. This value holds the 0th byte address of GDT.
+2. limit (16 bits) - It gives the size of the Global descriptor table size.
+*/
+struct gdt
+{
+	unsigned short limit;
+	unsigned int base;
+}__attribute__((packed));
+
+/*
+This is the structure of the enteries stored in GDT. information here is bit level but abstracted to byte level here
+Each row (single entry) defines a segment present in the physical memory.
+*/
+struct gdt_entry
+{
+	unsigned short segment_limit;
+	unsigned short base_address;
+	unsigned char first_base;
+	unsigned char type_dpl_present;
+	unsigned char avl_granularity;
+	unsigned char second_base;
+}__attribute__((packed));
+
+extern void gdt_flush();
+
+//extern struct gdt gdt_ptr;
+//extern struct gdt_entry global_gdt;
+
+void init_gdt_descriptor_table();
+void gdt_set_gate(int index, unsigned int base, unsigned int limit, unsigned char access, unsigned char gran);
+
+extern struct gdt_entry global_gd; 
+extern struct gdt gdt_ptr;
+
+#endif

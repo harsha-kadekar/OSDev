@@ -1,0 +1,98 @@
+There are 2 main modes
+1. Real Mode - This is old 8086 mode.
+2. Protected Mode
+
+On power up, it will be in Real Mode. The PE flag of CR0 will help us to move from Real Mode to Protection Mode [or otherwise]. 
+
+GDTR - Global Descriptor table register
+Size = [Part A]32 bit linear Base Address + [Part B]16 bit Table Limit.
+Part A - Linear address of byte 0 of the Global Descriptor Table.
+Part B - Total number of bytes present in the Global Descritor Table.
+
+We use LGDT (load value to GDTR register) SGDT (store value from GDTR register) to operate n GDRT register.
+On Power up, PART A will be 0 and Part B will be 0FFFFH values. As part of the OS initialization, we need to initialize correct value to GDTR.
+
+LDTR - Local Descriptor table register
+Size = [PartA]16 bits Segment Selector + [Part B] 32 bit Linear Base Address + [Part C]Segment Limit + [Part D]Attributes.
+Part A - Segment Selector
+Part B - Linear address of byte 0 of the Local Descriptor Table.
+Part C - Segment Limit will give you the size of the LDT.
+
+LLDT and SLDT is used to store the Segement Selector of LDTR. When we load the Segment Selector, automatically Other parts of LDTR will be loaded.
+Every Local Descriptor Table should have an entry in the GDT. Usually every process will have its own LDT.
+During task switch, LDTR is automatically loaded with the new tasks LDT. It will not save the prior LDT information.
+
+
+IDTR - Interrupt Descriptor table register
+Size = [Part A]32 bit linear Base Address + [Part B]16 bit Table Limit.
+Part A - Linear address of byte 0 of the interrupt Descriptor Table.
+Part B - Total number of bytes present in the interrupt Descritor Table.
+
+During power up, PartA will be 0 and PartB will be 0FFFFh, both of them has to be initialized by Operating System during its startup.
+Use LIDT and SIDT to load and store the Interrupt descriptor table register.
+
+Control Registers
+CR0 - System control flags that control operating mode and states of the processor. 0th bit (PE) is used to enable Protected mode. If 0 then it is in real mode. 31st bit (PG) will help to enable or disable paging. If PG set without setting PE, will result in General Protection Exception.
+CR1 - Reserved
+CR2 - Contains the linear address of the instruction which caused the Page fault.
+CR3 - Contains the physical address of the paging structure hierarchy and 2 flags. Usually Page Directory Tables address is stored. 2 flags are PCD and PWT help in cacheing.
+		Only Most significant bits is used for storage. Lower 12 bits is considered to be 0. So the Page Directory Table should be aligned to 4k bytes.
+CR4 - Flags that help in architectural extensions. bit 4 (PSE) helps to change the page size from 4kb to 4 MB. bit 5 (PAE) helps to define physical address which is more than 32 bits in size. bit 7 (PGE) helps to define certain pages as global pages which are available for all the users and will not be flushed from the TLB when context switch occurs.
+
+We can disable paging by setting a bit in CR0. But segmentation cannot be disabled, but we can set values in a such a way that it is of no much use.
+
+Segmentation provides a mechanism of isolating individual code, data, and stack modules so that multiple
+programs (or tasks) can run on the same processor without interfering with one another. Paging provides a mechanism
+for implementing a conventional demand-paged, virtual-memory system where sections of a program’s
+execution environment are mapped into physical memory as needed. Paging can also be used to provide isolation
+between multiple tasks
+
+Processor generates Logical Address. Each logical address (far pointer) has 2 parts - Segment Selector(16 bit) + OFFSET(32 bit).
+Segment Selector provides an offset to one of the Descriptor table - GDT or LDT. The Segment Descriptor obtained using the Segment Selector offset has lot of information like Base address of segment, size of the segment, access rights for the segment, segment type, privilege level. So this Base address + OFFSET = linear address.
+
+If paging is disabled then linear address = physical address
+
+If paging is enabled, we divide each of the segments into usually 4 kb blocks called as pages. This helps for us to create a virtual memory of size greater than available physical memory. We maintain this virtual memory using page directories and page tables. Generated Linear address will be transformed into Physicall address using the page tables. Pages can be either in the physical memory or in disk. If not in physical memory an interrutp is raised and then that page will be pulled to physical memory. Once done we  can continue from the point where it was stopped.
+
+Segmentation is a logical divide. Programmer has to know about the segmentation and he has to load the modules to different segment. In case of paging, it will be taken care by the processor and OS. Programmer need not be aware of the paging.
+
+Different mode of segmentation:
+Flat Model - Programs has access to coninuous, unsegmented address space. This is the way of hiding the segmentation. It should have 2 Segment descriptors. One for code and another of Data. For both, base address should be 0 and limit should be maximum possible available memory usually 4 GB.
+
+Protected Flat Model - This is similar to Flab model. But privileges will be different for different Segments. Example we will have Kernel Data and Code Segment which will have privilege level of 0 where as for user code and data segment will have privilge level as 3. But all of them will have base address as 0 and limit as maximum possible address. All CS, DS, ES, FS, GS, SS will have same limit and base value. Here also we are literarly not using segmentation to its full feature.
+
+MultiSegment Model - Full fledged segmentation is used. Each program will have its own set of segments. Each segments will have separate base and limit values. Also access rights and privileges will be different for different segments. 
+
+Steps For converting Logical address to linear address
+1. Use offset of the Segment Selector, use it to find the segment descriptor in GDT or LDT and then load it to processor.
+2. Check if segments have proper access rights. Also check if the offset of logical address is within the range of Segment.
+3. Add base address of Segment Descriptor and offset of the logical address to get linear address.
+
+
+Segment Selector has 3 main parts - 
+Index [3to 15 bits] - This acts as the index for the Global or Local Descriptor table. As there are 13 bits, it can select among 8192 descriptors within GDT/LDT. This index is multiplied by 8 (Size of each segment descriptor - 8 bytes) and then added to the base of Descriptor table to get the Segement Descriptor.
+TL - This indicates which table to read - 0 for GDT, 1 for LDT.
+RPL - What is the privilege level requested for this segment. 0, 1, 2 or 3.
+
+Segment Descriptor - Each row in the Descriptor Table [GDT/LDT]
+0|0-15: Segment Limit. if G = 0, then Limit can varry from 1 byte to 1 MB. If G = 1, then Limit can vary from 4kb to 4 GB. This value is combined with other segment limit in 1st byte to get full value.
+0|16-31: Base Address: 
+1|0-7: Base Address
+1|8-11: Segment Type
+1|12: Descriptor Type:System, Code-Data
+1|13-14:Descriptor Privilege level
+1|15:Segment Present
+1|16-19:Segment Limit
+1|20:Available for use by System Software
+1|21:64 bit code segment
+1|22:16 bit segment or 32 bit segment
+1|23:Granualirity - To interpret segment size as 1 byte or 4k bytes.
+1|24-31: Base address
+
+
+
+
+
+
+
+
