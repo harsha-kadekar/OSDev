@@ -1,0 +1,10 @@
+megs: 32
+romimage: file=$BXSHARE/BIOS-bochs-latest
+vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
+vga: extension=vbe, update_freq=15
+floppya: 1_44=trail.img, status=inserted
+boot: a
+log: bochsout.log
+mouse: enabled=0
+cpu: ips=15000000
+pci: enabled=1, chipset=i440fx
