@@ -8,6 +8,7 @@
 
 global loader			; the entry symbol for ELF
 extern main
+
 MAGIC_NUMBER equ 0x1BADB002	; this number indicates that what follows is an OS code
 FLAGS equ 0x0			; multiboot flags
 CHECKSUM equ -MAGIC_NUMBER	; (magic number + checksum + flags = 0)
