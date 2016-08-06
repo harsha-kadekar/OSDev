@@ -1,0 +1,3 @@
+	serial port initialized... log level set to Info
+2. Initializing global descriptor table.....
+	global descriptor table initialized
