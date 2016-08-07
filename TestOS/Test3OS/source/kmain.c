@@ -7,6 +7,7 @@
 #include "iodisplay.h"
 #include "string_functions.h"
 #include "memory_main.h"
+#include "interrupts.h"
 
 int main()
 {
@@ -19,6 +20,8 @@ int main()
 	char *strserial_port_initcomp = "\tserial port initialized... log level set to Info\n";
 	char *startgdt = "2. Initializing global descriptor table.....\n";
 	char *endgdt = "\tglobal descriptor table initialized\n";
+	char *startidt = "3. Initializing interrupt descriptor table & PIC.....\n";
+	char *endidt = "\tinterrupt descriptor table and PIC initialized\n";
 
 	init_console();
 	//puts(test, nlen);
@@ -35,6 +38,12 @@ int main()
 	initialize_gdt();
 	puts(endgdt,  37);
 	log(endgdt, 37, LOG_INFO);
+
+	log(startidt, 54, LOG_INFO);
+	puts(startidt, 54);
+	initialize_idt();
+	log(endidt, 48, LOG_INFO);
+	puts(endidt, 48);
 
 	return 0xF00DCAFE;			//Passing this value to verify whether call to main was successfull. after return EAX register should have this value.
 

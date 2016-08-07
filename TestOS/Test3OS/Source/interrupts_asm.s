@@ -5,19 +5,7 @@
 ; Date: 8/6/2016
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-global load_idt
 
-extern idtptr
-extern interrupt_handler
-
-; Name: load_idt
-; Description: This function will load the interrtupt descriptor table to the IDTR register
-;		stack when function called ->   [esp ]  - return address
-; Parameters: -
-; Return: -
-load_idt:
-	lidt [idtptr]
-	ret
 
 %macro no_error_code_interrupt_handler 1
 global interrupt_handler_%1
@@ -35,6 +23,32 @@ interrupt_handler_%1:
 	push dword %1
 	jmp common_interrupt_handler
 %endmacro
+
+%macro irq_code_handler 2
+global interrupt_request_%1
+interrupt_request_%1:
+	cli
+	push DWORD 0
+	push DWORD %2
+	jmp common_interrupt_request_handler
+%endmacro
+
+global load_idt
+
+extern idtptr
+extern interrupt_handler
+extern interrupt_request_handler
+
+section .text:
+
+; Name: load_idt
+; Description: This function will load the interrtupt descriptor table to the IDTR register
+;		stack when function called ->   [esp ]  - return address
+; Parameters: -
+; Return: -
+load_idt:
+	lidt [idtptr]
+	ret
 
 common_interrupt_handler:
 	push esp
@@ -58,6 +72,32 @@ common_interrupt_handler:
 	pop eax
 	pop esp
 
+	sti
+
+	iret
+
+common_interrupt_request_handler:
+	push esp
+	add DWORD [esp], 8
+	push eax
+	push ebx
+	push ecx
+	push edx
+	push ebp
+	push esi
+	push edi
+
+	call interrupt_request_handler
+
+	pop edi
+	pop esi
+	pop ebp
+	pop edx
+	pop ecx
+	pop ebx
+	pop eax
+	pop esp
+	
 	sti
 
 	iret
@@ -95,7 +135,22 @@ no_error_code_interrupt_handler 29
 no_error_code_interrupt_handler 30
 no_error_code_interrupt_handler 31
 
-
+irq_code_handler 0, 32
+irq_code_handler 1, 33
+irq_code_handler 2, 34
+irq_code_handler 3, 35
+irq_code_handler 4, 36
+irq_code_handler 5, 37
+irq_code_handler 6, 38
+irq_code_handler 7, 39
+irq_code_handler 8, 40
+irq_code_handler 9, 41
+irq_code_handler 10, 42
+irq_code_handler 11, 43
+irq_code_handler 12, 44
+irq_code_handler 13, 45
+irq_code_handler 14, 46
+irq_code_handler 15, 47
 
 
 	

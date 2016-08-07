@@ -107,7 +107,7 @@ int putc(char ch)
 // parameter: buf - character array to be filled into FB
 //	      len - length of the character array
 // return: 0 for success else error
-int puts(char *buf, unsigned int len)
+int puts(const char *buf, unsigned int len)
 {
 	int nReturn = 0;
 	unsigned int i = 0;

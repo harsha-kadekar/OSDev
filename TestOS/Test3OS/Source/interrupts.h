@@ -1,6 +1,15 @@
 #ifndef INTERRUPTS_H
 #define INTERRUPTS_H
 
+#define PIC1_PORT_A 0x20
+#define PIC2_PORT_A 0xA0
+
+#define PIC_ACK 0x20
+
+#define PIC1_START_INTERRUPT 0x20
+#define PIC2_START_INTERRUPT 0x28
+#define PIC2_END_INTERRUPT PIC2_START_INTERRUPT + 7
+
 // Name: load_idt
 // Description: This function will load the interrupt descriptor table  to the IDTR register. 
 //		It uses idtptr variable for doing this.
@@ -90,11 +99,34 @@ void interrupt_handler_29();
 void interrupt_handler_30();
 void interrupt_handler_31();
 
+void interrupt_request_handler(struct cpu_stack_state);
+
+void interrupt_request_0();
+void interrupt_request_1();
+void interrupt_request_2();
+void interrupt_request_3();
+void interrupt_request_4();
+void interrupt_request_5();
+void interrupt_request_6();
+void interrupt_request_7();
+void interrupt_request_8();
+void interrupt_request_9();
+void interrupt_request_10();
+void interrupt_request_11();
+void interrupt_request_12();
+void interrupt_request_13();
+void interrupt_request_14();
+void interrupt_request_15();
+
 extern struct idt_ptr idtptr;
 
 void initialize_idt();
 struct idt_table_entry idtDescriptorToidtEntry(struct idt_descriptor descript);
 struct idt_descriptor idtEntryToidtDescriptor(struct idt_table_entry entry);
 struct idt_descriptor getidtDescriptor(unsigned short segSelector, unsigned int offset, unsigned char p, unsigned char d, unsigned char reserved, unsigned char dpl, unsigned char common1, unsigned char common2, unsigned char onebit);
+void remap_irq();
+void install_irq_handler(unsigned int index, void (*irqHandler)(struct cpu_stack_state));
+void uninstall_irq_handler(unsigned int index);
+void pic_acknowledge(unsigned int interrupt);
 
 #endif
