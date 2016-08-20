@@ -8,6 +8,7 @@
 #include "string_functions.h"
 #include "memory_main.h"
 #include "interrupts.h"
+#include "timer.h"
 
 int main()
 {
@@ -22,6 +23,8 @@ int main()
 	char *endgdt = "\tglobal descriptor table initialized\n";
 	char *startidt = "3. Initializing interrupt descriptor table & PIC.....\n";
 	char *endidt = "\tinterrupt descriptor table and PIC initialized\n";
+	char *starttimer = "4. Initializing timer interrupt....\n";
+	char *endtimer = "\ttimer interrupt installed\n";
 
 	init_console();
 	//puts(test, nlen);
@@ -44,6 +47,12 @@ int main()
 	initialize_idt();
 	log(endidt, 48, LOG_INFO);
 	puts(endidt, 48);
+
+	log(starttimer, 36, LOG_INFO);
+	puts(starttimer, 36);
+	initialize_timer_interrupt();
+	log(endtimer, 27, LOG_INFO);
+	puts(endtimer, 27);
 
 	return 0xF00DCAFE;			//Passing this value to verify whether call to main was successfull. after return EAX register should have this value.
 
