@@ -81,7 +81,7 @@ void timerinterrupthandler(struct cpu_stack_state state)
 	if((nSeconds % 60) == 0 && nSeconds != 0)
 	{
 		nMinutes++;
-		puts("1 Minute has passed\n", 20);
+		//puts("1 Minute has passed\n", 20);
 		nSeconds = 0;
 	}
 

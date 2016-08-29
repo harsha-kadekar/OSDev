@@ -9,6 +9,7 @@
 #include "memory_main.h"
 #include "interrupts.h"
 #include "timer.h"
+#include "keyboard_driver.h"
 
 int main()
 {
@@ -25,6 +26,8 @@ int main()
 	char *endidt = "\tinterrupt descriptor table and PIC initialized\n";
 	char *starttimer = "4. Initializing timer interrupt....\n";
 	char *endtimer = "\ttimer interrupt installed\n";
+	char *startkeyboard = "5. Initializing keyboard interrupt.....\n";
+	char *endkeyboard = "\tkeyboard interrupt installed\n";
 
 	init_console();
 	//puts(test, nlen);
@@ -53,6 +56,12 @@ int main()
 	initialize_timer_interrupt();
 	log(endtimer, 27, LOG_INFO);
 	puts(endtimer, 27);
+
+	log(startkeyboard, 40, LOG_INFO);
+	puts(startkeyboard, 40);
+	install_keyboard_interrupt();
+	log(endkeyboard, 30, LOG_INFO);
+	puts(endkeyboard, 30);
 
 	return 0xF00DCAFE;			//Passing this value to verify whether call to main was successfull. after return EAX register should have this value.
 
