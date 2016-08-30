@@ -9,12 +9,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 global loader			; the entry symbol for ELF
-extern main
+extern newmain
+
 
 MAGIC_NUMBER equ 0x1BADB002	; this number indicates that what follows is an OS code
 ALIGNINFO equ 1<<0
 MEMINFO equ 1<<1
-FLAGS equ ALIGNINFO | MEMINFO			; multiboot flags
+ALIGNMODULES equ 0x00000001
+FLAGS equ ALIGNINFO | MEMINFO | ALIGNMODULES			; multiboot flags
 CHECKSUM equ -(MAGIC_NUMBER + FLAGS)	; (magic number + checksum + flags = 0)
 
 KERNEL_STACK_SIZE equ 16384	; This is the stack size which will be created when starting OS.
@@ -37,7 +39,8 @@ loader:				; This will be the entry point of the Operating System as mentioned i
 	mov eax, 0xCAFEBABE
 	mov esp, kernel_stack + KERNEL_STACK_SIZE	; Stack pointer will point to the end of the stack, as we push stack pointer is decreased and moves 
 							; towards lower address
-	call main
+	push ebx					; This has multiboot info structure pointer
+	call newmain
 	;mov eax, 0xF00DCAFE
 
 .loop:

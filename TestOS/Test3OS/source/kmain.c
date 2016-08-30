@@ -10,8 +10,29 @@
 #include "interrupts.h"
 #include "timer.h"
 #include "keyboard_driver.h"
+#include "multiboot.h"
 
-int main()
+typedef void (*call_module)(void);
+
+int Nmain(unsigned int ebx)
+{
+	multiboot_info_t *mbInfo = (multiboot_info_t *)ebx;
+	unsigned int address_of_module = mbInfo->mods_addr;
+
+	call_module start_program = (call_module)address_of_module;
+
+	if(mbInfo->mods_count == 1)
+	{
+		start_program();
+		return 0x700BE;
+	}
+	else
+	{
+		return 0xCAFEBABE;
+	}
+}
+
+int newmain(unsigned int ebx)
 {
 	/*char *test = "asflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;l\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;ljlasfaf\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljs\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nasflkjalskjalsfjlasfjljasl;fkjalsfjlaskjfljasfl;jlsfj;lasjf;ljslfjl;asfl;jl;lj\nThis is my test string.";
 	int nlen = string_length(test);*/
@@ -28,6 +49,13 @@ int main()
 	char *endtimer = "\ttimer interrupt installed\n";
 	char *startkeyboard = "5. Initializing keyboard interrupt.....\n";
 	char *endkeyboard = "\tkeyboard interrupt installed\n";
+
+	multiboot_info_t *mbInfo = (multiboot_info_t *)ebx;
+	unsigned int address_of_module = mbInfo->mods_addr;
+
+	call_module start_program = (call_module)address_of_module;
+	UNUSED(start_program);
+	
 
 	init_console();
 	//puts(test, nlen);
@@ -62,6 +90,8 @@ int main()
 	install_keyboard_interrupt();
 	log(endkeyboard, 30, LOG_INFO);
 	puts(endkeyboard, 30);
+
+	//start_program();
 
 	return 0xF00DCAFE;			//Passing this value to verify whether call to main was successfull. after return EAX register should have this value.
 
