@@ -15,7 +15,7 @@ Current OS development is Test3OS.
 
 It is a basic kernel similar in architecture to Linux kernel. It is targeted for x86 architecture. 
 
-Demo - 
+Demo (Click on the image )- 
 
 [![ScreenShot](Test3OS_Demo.png)](https://drive.google.com/open?id=0BxQoWoSofKvaRzRUbWx3TzFGQVE)
 
