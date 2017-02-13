@@ -17,7 +17,7 @@ It is a basic kernel similar in architecture to Linux kernel. It is targeted for
 
 Demo (Click on the image )- 
 
-[![ScreenShot](Test3OS_Demo.png)](https://drive.google.com/open?id=0BxQoWoSofKvaRzRUbWx3TzFGQVE)
+[![ScreenShot](Test3OS_Demo.png)](https://drive.google.com/file/d/0BxQoWoSofKvaTmtnMERWbkFhaHM/view?usp=sharing)
 
 Plan is to develop following things - 
 
