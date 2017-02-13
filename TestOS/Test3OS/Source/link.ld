@@ -32,4 +32,6 @@ SECTIONS
 		*(COMMON)	/* all COMMON sections from all files */
 		*(.bss*)		/* all bss sections from all files */
 	}
+
+	end = .; _end = .; __end = .;
 }

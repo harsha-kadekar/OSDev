@@ -11,6 +11,8 @@
 #include "timer.h"
 #include "keyboard_driver.h"
 #include "multiboot.h"
+#include "common_functions.h"
+#include "paging.h"
 
 typedef void (*call_module)(void);
 
@@ -49,6 +51,8 @@ int newmain(unsigned int ebx)
 	char *endtimer = "\ttimer interrupt installed\n";
 	char *startkeyboard = "5. Initializing keyboard interrupt.....\n";
 	char *endkeyboard = "\tkeyboard interrupt installed\n";
+	char *startpaging = "6. Initializing paging....\n";
+	char *endpaging = "\tpaging initialized\n";
 
 	multiboot_info_t *mbInfo = (multiboot_info_t *)ebx;
 	unsigned int address_of_module = mbInfo->mods_addr;
@@ -90,6 +94,20 @@ int newmain(unsigned int ebx)
 	install_keyboard_interrupt();
 	log(endkeyboard, 30, LOG_INFO);
 	puts(endkeyboard, 30);
+
+	log(startpaging, 27, LOG_INFO);
+	puts(startpaging, 27);
+	initialize_paging();
+	log(endpaging, 20, LOG_INFO);
+	puts(endpaging, 20);
+
+	//Uncomment following code to check if page fault is generated or not
+
+	//unsigned int *ptr = (unsigned int*)0xA0000000;
+   	//unsigned int do_page_fault = *ptr;
+
+	//do_page_fault++;
+	
 
 	//start_program();
 

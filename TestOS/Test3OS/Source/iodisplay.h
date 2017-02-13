@@ -75,6 +75,8 @@ unsigned short getPositionForFB(int row, int col);
 void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg);
 int putc(char ch);
 int puts(const char *buf, unsigned int len);
+void put_number_dec(unsigned int n);
+void put_number_hex(unsigned int n);
 void scroll();
 void setbackgroundcolor(unsigned char newBG);
 void setforegroundcolor(unsigned char newFG);
